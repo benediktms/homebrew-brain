@@ -1,20 +1,20 @@
 class Brain < Formula
   desc "A local-first personal second brain with token-budgeted retrieval for AI agents"
   homepage "https://github.com/benediktms/brain"
-  version "0.3.6"
+  version "0.3.7"
   if OS.mac?
     if Hardware::CPU.arm?
-      url "https://github.com/benediktms/brain/releases/download/v0.3.6/brain-aarch64-apple-darwin.tar.xz"
-      sha256 "d255443328fbe9ff6ea0681412f4c89abd0492ce428dbd050ebae73dba5dcfc3"
+      url "https://github.com/benediktms/brain/releases/download/v0.3.7/brain-aarch64-apple-darwin.tar.xz"
+      sha256 "319fa30b5dd4dfd04fa2d9d1204cbb16b6bd1506e384cf0b68389e637e2379eb"
     end
     if Hardware::CPU.intel?
-      url "https://github.com/benediktms/brain/releases/download/v0.3.6/brain-x86_64-apple-darwin.tar.xz"
-      sha256 "27140196a58aedfc40a90fd670a7802ed3f0a30e9ae8600e354757349beb0492"
+      url "https://github.com/benediktms/brain/releases/download/v0.3.7/brain-x86_64-apple-darwin.tar.xz"
+      sha256 "967b3c40b4b2148f737a14502b90a57e7447cf8e35c28992aadffb01430d6e3d"
     end
   end
   if OS.linux? && Hardware::CPU.intel?
-    url "https://github.com/benediktms/brain/releases/download/v0.3.6/brain-x86_64-unknown-linux-gnu.tar.xz"
-    sha256 "180215bbac98f7d494f7dc8339bacb85c4e3470c6b3cb74d7b8928a820812f14"
+    url "https://github.com/benediktms/brain/releases/download/v0.3.7/brain-x86_64-unknown-linux-gnu.tar.xz"
+    sha256 "0ec953397490614b08737848344bada0bb9abe200da85dea92a21958a08d573c"
   end
 
   BINARY_ALIASES = {
