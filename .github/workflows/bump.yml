@@ -1,0 +1,62 @@
+name: Bump brain formula on release
+
+on:
+  repository_dispatch:
+    types: [brain-released]
+
+  # Allow manual triggering with a version input
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag (e.g. v0.4.2)"
+        required: true
+        type: string
+
+jobs:
+  bump:
+    permissions:
+      contents: write       # Required for brew bump-formula-pr to create branches/commits
+      pull-requests: write  # Required for gh pr merge to merge the bump PR
+    concurrency:
+      group: bump-brain-formula
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@8eb7f2efa6ab636da09aef605b497fd5b8a7587d # master
+
+      - name: Clone homebrew-brain
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Bump formula
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.event.client_payload.version || inputs.version }}
+        run: |
+          # Strip leading 'v' if present
+          VERSION="${VERSION#v}"
+          echo "Bumping brain to $VERSION"
+          brew bump-formula-pr \
+            --version="$VERSION" \
+            --no-browse \
+            --limit=1 \
+            brain
+
+      - name: Enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.event.client_payload.version || inputs.version }}
+        run: |
+          # Normalize VERSION (strip leading 'v') to match the branch name created
+          # by `brew bump-formula-pr`, which always strips the 'v' prefix.
+          VERSION="${VERSION#v}"
+          # Enable auto-merge on the PR created by bump-formula-pr
+          PR_NUMBER=$(gh pr list --head "bump-brain-$VERSION" --json number --jq '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr merge --merge "$PR_NUMBER"
+          else
+            echo "No PR found with head bump-brain-$VERSION"
+          fi

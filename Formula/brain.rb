@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 class Brain < Formula
-  desc "A local-first personal second brain with token-budgeted retrieval for AI agents"
+  desc "Your thinking surface — tasks, records, wiki, and semantic search in one place"
   homepage "https://github.com/benediktms/brain"
+  license "MIT"
   version "0.4.2"
   if OS.mac?
     if Hardware::CPU.arm?
@@ -52,5 +55,33 @@ class Brain < Formula
     # Install any leftover files in pkgshare; these are probably config or
     # sample files.
     pkgshare.install(*leftover_contents) unless leftover_contents.empty?
+  end
+
+  # `brew upgrade` automatically calls `brew services restart brain` when this
+  # service block is present — launchd/systemd picks up the new binary on restart.
+  service do
+    run [
+      opt_bin/"brain-daemon",
+      "--socket-path", "#{ENV["HOME"]}/.brain/brain-rpc.sock",
+      "--pid-file", "#{ENV["HOME"]}/.brain/brain.pid",
+      "--sqlite-db", "#{ENV["HOME"]}/.brain/brain.db",
+      "--lance-db", "#{ENV["HOME"]}/.brain/lancedb",
+    ]
+    keep_alive true
+    restart_delay 5
+    run_at_load true
+    log_path "#{ENV["HOME"]}/.brain/logs/brain.log"
+    error_log_path "#{ENV["HOME"]}/.brain/logs/brain.err.log"
+    environment_variables PATH: "#{ENV["HOME"]}/bin:#{std_service_path_env}"
+  end
+
+  def caveats
+    <<~EOS
+      The brain daemon is installed. Start it with: brew services start brain
+
+      To stop the daemon:       brew services stop brain
+      To restart the daemon:    brew services restart brain
+      To view logs:             tail -f ~/.brain/logs/brain.log
+    EOS
   end
 end
