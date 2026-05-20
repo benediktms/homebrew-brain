@@ -1,23 +1,20 @@
-# frozen_string_literal: true
-
 class Brain < Formula
-  desc "Your thinking surface — tasks, records, wiki, and semantic search in one place"
+  desc "A local-first personal second brain with token-budgeted retrieval for AI agents"
   homepage "https://github.com/benediktms/brain"
-  license "MIT"
-  version "0.4.2"
+  version "0.4.3"
   if OS.mac?
     if Hardware::CPU.arm?
-      url "https://github.com/benediktms/brain/releases/download/v0.4.2/brain-aarch64-apple-darwin.tar.xz"
-      sha256 "e1d0189419f95ed844af313c4db828d9ff8010c22ce5120cbd57e99450e2fe36"
+      url "https://github.com/benediktms/brain/releases/download/v0.4.3/brain-aarch64-apple-darwin.tar.xz"
+      sha256 "13d5739edcdbdab7e106a2f915825e25ab63741eda293a5e118555a25358a2ec"
     end
     if Hardware::CPU.intel?
-      url "https://github.com/benediktms/brain/releases/download/v0.4.2/brain-x86_64-apple-darwin.tar.xz"
-      sha256 "2da95bc7d287f92e2e7385a2247857dccdaced0570d46589473d17b17c3df80a"
+      url "https://github.com/benediktms/brain/releases/download/v0.4.3/brain-x86_64-apple-darwin.tar.xz"
+      sha256 "7299bfa08bb72822020263aff0c7ddceba29bc6fa40aa9256ab551540419e1f3"
     end
   end
   if OS.linux? && Hardware::CPU.intel?
-    url "https://github.com/benediktms/brain/releases/download/v0.4.2/brain-x86_64-unknown-linux-gnu.tar.xz"
-    sha256 "b77078be0d7dee27b7ecc51544de60f303dde1922c16450e10d32ea3d3c474b7"
+    url "https://github.com/benediktms/brain/releases/download/v0.4.3/brain-x86_64-unknown-linux-gnu.tar.xz"
+    sha256 "1445ac2e4f150e51f3e6e5484736177de7d0fa6bf2853782190eb85c8b3eceae"
   end
 
   BINARY_ALIASES = {
@@ -55,33 +52,5 @@ class Brain < Formula
     # Install any leftover files in pkgshare; these are probably config or
     # sample files.
     pkgshare.install(*leftover_contents) unless leftover_contents.empty?
-  end
-
-  # `brew upgrade` automatically calls `brew services restart brain` when this
-  # service block is present — launchd/systemd picks up the new binary on restart.
-  service do
-    run [
-      opt_bin/"brain-daemon",
-      "--socket-path", "#{ENV["HOME"]}/.brain/brain-rpc.sock",
-      "--pid-file", "#{ENV["HOME"]}/.brain/brain.pid",
-      "--sqlite-db", "#{ENV["HOME"]}/.brain/brain.db",
-      "--lance-db", "#{ENV["HOME"]}/.brain/lancedb",
-    ]
-    keep_alive true
-    restart_delay 5
-    run_at_load true
-    log_path "#{ENV["HOME"]}/.brain/logs/brain.log"
-    error_log_path "#{ENV["HOME"]}/.brain/logs/brain.err.log"
-    environment_variables PATH: "#{ENV["HOME"]}/bin:#{std_service_path_env}"
-  end
-
-  def caveats
-    <<~EOS
-      The brain daemon is installed. Start it with: brew services start brain
-
-      To stop the daemon:       brew services stop brain
-      To restart the daemon:    brew services restart brain
-      To view logs:             tail -f ~/.brain/logs/brain.log
-    EOS
   end
 end
