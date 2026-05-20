@@ -72,7 +72,7 @@ class Brain < Formula
     run_at_load true
     log_path "#{ENV["HOME"]}/.brain/logs/brain.log"
     error_log_path "#{ENV["HOME"]}/.brain/logs/brain.err.log"
-    environment_variables PATH: "#{ENV["HOME"]}/bin:/usr/local/bin:/usr/bin:/bin"
+    environment_variables PATH: "#{ENV["HOME"]}/bin:#{std_service_path_env}"
   end
 
   def caveats
